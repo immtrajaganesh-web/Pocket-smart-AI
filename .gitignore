@@ -5,3 +5,6 @@ __pycache__/
 data/*.db
 .pytest_cache/
 .coverage
+*firebase*.json
+*serviceAccount*.json
+

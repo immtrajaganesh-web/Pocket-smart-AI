@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 1440
     frontend_origins: str = "http://127.0.0.1:8000,http://localhost:8000"
     max_upload_mb: int = 5
+    firebase_service_account_json: str = ""
+    firebase_credentials_path: str = ""
+    firebase_project_id: str = ""
+    firebase_database_url: str = ""
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=False, extra="ignore")
     @property
     def origins(self): return [x.strip() for x in self.frontend_origins.split(",") if x.strip()]

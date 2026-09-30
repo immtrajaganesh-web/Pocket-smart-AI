@@ -25,17 +25,22 @@ def save(db: Session, user: Optional[User], planner: str, p: Dict[str, Any], res
     title = titles.get(planner, f"{planner.title()} Plan")
     
     if user:
-        r = Recommendation(
-            user_id=user.id,
-            planner=planner,
-            title=title,
-            request_data=p,
-            result_data=result
-        )
-        db.add(r)
-        db.commit()
-        db.refresh(r)
-        result["recommendation_id"] = r.id
+        from app.firebase_db import is_firebase_configured, fb_save_recommendation
+        if is_firebase_configured():
+            fb_res = fb_save_recommendation(str(user.id), planner, title, p, result)
+            result["recommendation_id"] = fb_res["id"]
+        else:
+            r = Recommendation(
+                user_id=int(user.id),
+                planner=planner,
+                title=title,
+                request_data=p,
+                result_data=result
+            )
+            db.add(r)
+            db.commit()
+            db.refresh(r)
+            result["recommendation_id"] = r.id
         result["is_guest"] = False
     else:
         result["recommendation_id"] = None
@@ -83,54 +88,91 @@ async def jewelry(
     return save(db, user, "jewelry", p, generate("jewelry", p, img))
 
 @router.post("/save-recommendation")
-def save_custom_plan(d: SavePlanRequest, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    r = Recommendation(
-        user_id=user.id,
-        planner=d.planner,
-        title=d.title,
-        request_data=d.request_data,
-        result_data=d.result_data
-    )
-    db.add(r)
-    db.commit()
-    db.refresh(r)
-    return {"id": r.id, "message": "Plan saved to dashboard successfully"}
+def save_custom_plan(d: SavePlanRequest, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    from app.firebase_db import is_firebase_configured, fb_save_recommendation
+    if is_firebase_configured():
+        return fb_save_recommendation(str(user.id), d.planner, d.title, d.request_data, d.result_data)
+    else:
+        r = Recommendation(
+            user_id=int(user.id),
+            planner=d.planner,
+            title=d.title,
+            request_data=d.request_data,
+            result_data=d.result_data
+        )
+        db.add(r)
+        db.commit()
+        db.refresh(r)
+        return {"id": r.id, "message": "Plan saved to dashboard successfully"}
 
 @router.get("/recommendations-details/{rid}")
-def details(rid: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    r = db.get(Recommendation, rid)
-    if not r or r.user_id != user.id:
-        raise HTTPException(404, "Recommendation not found")
-    return {
-        "id": r.id,
-        "planner": r.planner,
-        "title": r.title,
-        "request": r.request_data,
-        "result": r.result_data,
-        "created_at": r.created_at
-    }
-
-@router.delete("/recommendations/{rid}")
-def delete_recommendation(rid: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    r = db.get(Recommendation, rid)
-    if not r or r.user_id != user.id:
-        raise HTTPException(404, "Recommendation not found")
-    db.delete(r)
-    db.commit()
-    return {"message": "Plan deleted successfully"}
-
-@router.get("/history")
-def history(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    rows = db.query(Recommendation).filter(Recommendation.user_id == user.id).order_by(Recommendation.created_at.desc()).all()
-    return [
-        {
+def details(rid: str, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    from app.firebase_db import is_firebase_configured, fb_get_recommendation
+    if is_firebase_configured():
+        r = fb_get_recommendation(rid, str(user.id))
+        if not r:
+            raise HTTPException(404, "Recommendation not found")
+        return {
+            "id": r["id"],
+            "planner": r.get("planner"),
+            "title": r.get("title"),
+            "request": r.get("request_data"),
+            "result": r.get("result_data"),
+            "created_at": r.get("created_at")
+        }
+    else:
+        try:
+            numeric_id = int(rid)
+        except ValueError:
+            raise HTTPException(404, "Recommendation not found")
+        r = db.get(Recommendation, numeric_id)
+        if not r or r.user_id != user.id:
+            raise HTTPException(404, "Recommendation not found")
+        return {
             "id": r.id,
             "planner": r.planner,
             "title": r.title,
-            "created_at": r.created_at,
-            "summary": r.result_data.get("summary", ""),
-            "budget": r.result_data.get("budget", 0),
-            "currency": r.result_data.get("currency", "INR")
+            "request": r.request_data,
+            "result": r.result_data,
+            "created_at": r.created_at
         }
-        for r in rows
-    ]
+
+@router.delete("/recommendations/{rid}")
+def delete_recommendation(rid: str, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    from app.firebase_db import is_firebase_configured, fb_delete_recommendation
+    if is_firebase_configured():
+        success = fb_delete_recommendation(rid, str(user.id))
+        if not success:
+            raise HTTPException(404, "Recommendation not found")
+        return {"message": "Plan deleted successfully"}
+    else:
+        try:
+            numeric_id = int(rid)
+        except ValueError:
+            raise HTTPException(404, "Recommendation not found")
+        r = db.get(Recommendation, numeric_id)
+        if not r or r.user_id != user.id:
+            raise HTTPException(404, "Recommendation not found")
+        db.delete(r)
+        db.commit()
+        return {"message": "Plan deleted successfully"}
+
+@router.get("/history")
+def history(db: Session = Depends(get_db), user = Depends(get_current_user)):
+    from app.firebase_db import is_firebase_configured, fb_get_user_history
+    if is_firebase_configured():
+        return fb_get_user_history(str(user.id))
+    else:
+        rows = db.query(Recommendation).filter(Recommendation.user_id == user.id).order_by(Recommendation.created_at.desc()).all()
+        return [
+            {
+                "id": r.id,
+                "planner": r.planner,
+                "title": r.title,
+                "created_at": r.created_at,
+                "summary": r.result_data.get("summary", ""),
+                "budget": r.result_data.get("budget", 0),
+                "currency": r.result_data.get("currency", "INR")
+            }
+            for r in rows
+        ]
