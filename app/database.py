@@ -8,7 +8,8 @@ settings = get_settings()
 db_url = settings.database_url
 
 # On Vercel serverless, filesystem is read-only except /tmp
-if os.environ.get("VERCEL") and db_url == "sqlite:///./data/pocketsmart.db":
+is_serverless = bool(os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))
+if is_serverless and db_url.startswith("sqlite") and "/tmp" not in db_url:
     db_url = "sqlite:////tmp/pocketsmart.db"
 
 # Normalise postgres:// (e.g. Supabase, Neon) to postgresql:// for SQLAlchemy

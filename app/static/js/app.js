@@ -2,11 +2,13 @@
 
 // API Wrapper
 async function api(url, opt = {}) {
+  const token = localStorage.getItem('ps_access_token');
+  const authHeader = token ? { 'Authorization': `Bearer ${token}` } : {};
   const defaultHeaders = opt.body instanceof FormData ? {} : { 'Content-Type': 'application/json' };
   const r = await fetch(url, {
     credentials: 'include',
     ...opt,
-    headers: { ...defaultHeaders, ...(opt.headers || {}) }
+    headers: { ...defaultHeaders, ...authHeader, ...(opt.headers || {}) }
   });
   
   let d = {};
@@ -92,6 +94,7 @@ async function syncSession() {
 // Logout handler
 document.getElementById('logoutBtn')?.addEventListener('click', async () => {
   try {
+    localStorage.removeItem('ps_access_token');
     await api('/api/auth/logout', { method: 'POST' });
     showToast('Logged out successfully');
     setTimeout(() => { location.href = '/login'; }, 400);
@@ -105,10 +108,13 @@ async function quickDemoLogin() {
   const demoEmail = 'demo@pocketsmart.ai';
   const demoPass = 'password123';
   const submitBtn = document.getElementById('authSubmitBtn');
-  if (submitBtn) submitBtn.disabled = true;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span> Logging in...';
+  }
   
   try {
-    // Try registering first, ignore if exists
+    // Try registering first, ignore if already exists
     try {
       await api('/api/auth/register', {
         method: 'POST',
@@ -119,58 +125,109 @@ async function quickDemoLogin() {
     }
 
     // Login
-    await api('/api/auth/login', {
+    const loginRes = await api('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email: demoEmail, password: demoPass })
     });
+
+    if (loginRes && loginRes.access_token) {
+      localStorage.setItem('ps_access_token', loginRes.access_token);
+    }
     
     showToast('Logged into demo account!');
-    setTimeout(() => { location.href = '/dashboard'; }, 400);
+    setTimeout(() => { location.href = '/dashboard'; }, 350);
   } catch (err) {
     showToast(err.message, 'error');
-    if (submitBtn) submitBtn.disabled = false;
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Sign In to Dashboard';
+    }
   }
 }
 
-// Auth Form Handler
-if (window.AUTH_MODE) {
-  document.getElementById('authForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const btn = document.getElementById('authSubmitBtn');
-    const msg = document.getElementById('message');
-    msg.textContent = '';
-    
-    const formData = new FormData(e.target);
-    const payload = Object.fromEntries(formData);
-    
+// Global Auth Form Handler (handles both Submit event and onsubmit attribute)
+async function handleAuthSubmit(e) {
+  if (e && e.preventDefault) e.preventDefault();
+  
+  const form = document.getElementById('authForm');
+  if (!form) return false;
+
+  const btn = document.getElementById('authSubmitBtn');
+  const msg = document.getElementById('message');
+  if (msg) msg.textContent = '';
+
+  const isRegister = (window.AUTH_MODE === 'register') || 
+                     window.location.pathname.includes('/register') || 
+                     document.getElementById('nameInput') !== null;
+
+  const formData = new FormData(form);
+  const payload = Object.fromEntries(formData.entries());
+
+  const email = (payload.email || '').trim().toLowerCase();
+  const password = payload.password || '';
+  const name = (payload.name || '').trim();
+
+  if (isRegister && name.length < 2) {
+    if (msg) { msg.textContent = 'Please enter your full name (at least 2 characters).'; msg.style.color = '#f87171'; }
+    return false;
+  }
+  if (!email || !email.includes('@')) {
+    if (msg) { msg.textContent = 'Please enter a valid email address.'; msg.style.color = '#f87171'; }
+    return false;
+  }
+  if (password.length < 8) {
+    if (msg) { msg.textContent = 'Password must be at least 8 characters.'; msg.style.color = '#f87171'; }
+    return false;
+  }
+
+  if (btn) {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Processing...';
-    
-    try {
-      const endpoint = window.AUTH_MODE === 'register' ? '/api/auth/register' : '/api/auth/login';
-      await api(endpoint, {
+  }
+
+  try {
+    if (isRegister) {
+      await api('/api/auth/register', {
         method: 'POST',
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ name, email, password })
       });
-      
-      // If registered, also login
-      if (window.AUTH_MODE === 'register') {
-        await api('/api/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({ email: payload.email, password: payload.password })
-        });
-      }
-      
-      showToast('Welcome to PocketSmart AI!');
-      setTimeout(() => { location.href = '/dashboard'; }, 400);
-    } catch (err) {
-      msg.textContent = err.message;
-      msg.style.color = '#f87171';
-      btn.disabled = false;
-      btn.textContent = window.AUTH_MODE === 'register' ? 'Create Free Account' : 'Sign In to Dashboard';
     }
-  });
+
+    const loginRes = await api('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password })
+    });
+
+    if (loginRes && loginRes.access_token) {
+      localStorage.setItem('ps_access_token', loginRes.access_token);
+    }
+
+    showToast(isRegister ? 'Account created successfully! Welcome!' : 'Signed in successfully!');
+    setTimeout(() => { location.href = '/dashboard'; }, 350);
+  } catch (err) {
+    if (msg) {
+      msg.textContent = err.message || 'Authentication failed. Please check your credentials.';
+      msg.style.color = '#f87171';
+    } else {
+      showToast(err.message, 'error');
+    }
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = isRegister ? 'Create Free Account' : 'Sign In to Dashboard';
+    }
+  }
+  return false;
 }
+window.handleAuthSubmit = handleAuthSubmit;
+
+function initAuthForm() {
+  const form = document.getElementById('authForm');
+  if (form && !form.dataset.bound) {
+    form.dataset.bound = 'true';
+    form.addEventListener('submit', handleAuthSubmit);
+  }
+}
+window.initAuthForm = initAuthForm;
 
 // Interactive Chip Selection helper
 document.addEventListener('click', (e) => {
@@ -195,6 +252,11 @@ document.addEventListener('click', (e) => {
 
 // Run initial checks
 document.addEventListener('DOMContentLoaded', () => {
+  initAuthForm();
   checkAiHealth();
   syncSession();
 });
+
+if (document.readyState === 'interactive' || document.readyState === 'complete') {
+  initAuthForm();
+}

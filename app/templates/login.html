@@ -23,24 +23,28 @@
       <a href="/register" class="auth-tab-btn {% if mode == 'register' %}active{% endif %}">Create Account</a>
     </div>
 
+    <script>
+      window.AUTH_MODE = "{{ mode }}";
+    </script>
+
     <div id="message" style="margin-bottom: 1rem; font-size: 0.85rem; text-align: center;"></div>
 
-    <form id="authForm" class="stack" style="display: flex; flex-direction: column; gap: 1.15rem;">
+    <form id="authForm" class="stack" style="display: flex; flex-direction: column; gap: 1.15rem;" onsubmit="handleAuthSubmit(event); return false;">
       {% if mode == 'register' %}
       <div class="form-group">
         <label for="nameInput">Full Name</label>
-        <input type="text" id="nameInput" name="name" class="input-control" placeholder="Jane Doe" required minlength="2">
+        <input type="text" id="nameInput" name="name" class="input-control" placeholder="Jane Doe" required minlength="2" autocomplete="name">
       </div>
       {% endif %}
 
       <div class="form-group">
         <label for="emailInput">Email Address</label>
-        <input type="email" id="emailInput" name="email" class="input-control" placeholder="you@example.com" required>
+        <input type="email" id="emailInput" name="email" class="input-control" placeholder="you@example.com" required autocomplete="email">
       </div>
 
       <div class="form-group">
         <label for="passwordInput">Password</label>
-        <input type="password" id="passwordInput" name="password" class="input-control" placeholder="At least 8 characters" required minlength="8">
+        <input type="password" id="passwordInput" name="password" class="input-control" placeholder="At least 8 characters" required minlength="8" autocomplete="current-password">
       </div>
 
       <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" id="authSubmitBtn">
@@ -62,5 +66,8 @@
 {% block scripts %}
 <script>
   window.AUTH_MODE = "{{ mode }}";
+  if (typeof initAuthForm === 'function') {
+    initAuthForm();
+  }
 </script>
 {% endblock %}
