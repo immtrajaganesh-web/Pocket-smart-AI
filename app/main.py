@@ -11,7 +11,9 @@ async def lifespan(app): Base.metadata.create_all(bind=engine);yield
 Base.metadata.create_all(bind=engine)
 app=FastAPI(title=s.app_name,version="1.0.0",lifespan=lifespan)
 app.add_middleware(CORSMiddleware,allow_origins=s.origins,allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
-app.mount("/static",StaticFiles(directory="app/static"),name="static")
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 app.include_router(pages.router);app.include_router(auth.router);app.include_router(session.router);app.include_router(recommendations.router)
 @app.get("/api/health")
 def health(): return {"status":"ok","app":s.app_name,"gemini_configured":bool(s.gemini_api_key),"model":s.gemini_model}
