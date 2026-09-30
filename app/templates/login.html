@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}{% if mode == 'register' %}Create Account{% else %}Sign In{% endif %} — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="auth-header">
+      <div class="brand-icon" style="margin: 0 auto 1rem; width: 48px; height: 48px;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+          <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+          <line x1="12" y1="22.08" x2="12" y2="12"></line>
+        </svg>
+      </div>
+      <h1>{% if mode == 'register' %}Create PocketSmart Account{% else %}Welcome Back{% endif %}</h1>
+      <p>{% if mode == 'register' %}Start saving plans and tracking cross-platform budgets{% else %}Sign in to manage and review your custom budget plans{% endif %}</p>
+    </div>
+
+    <!-- Mode Selector Tabs -->
+    <div class="auth-tabs">
+      <a href="/login" class="auth-tab-btn {% if mode != 'register' %}active{% endif %}">Sign In</a>
+      <a href="/register" class="auth-tab-btn {% if mode == 'register' %}active{% endif %}">Create Account</a>
+    </div>
+
+    <div id="message" style="margin-bottom: 1rem; font-size: 0.85rem; text-align: center;"></div>
+
+    <form id="authForm" class="stack" style="display: flex; flex-direction: column; gap: 1.15rem;">
+      {% if mode == 'register' %}
+      <div class="form-group">
+        <label for="nameInput">Full Name</label>
+        <input type="text" id="nameInput" name="name" class="input-control" placeholder="Jane Doe" required minlength="2">
+      </div>
+      {% endif %}
+
+      <div class="form-group">
+        <label for="emailInput">Email Address</label>
+        <input type="email" id="emailInput" name="email" class="input-control" placeholder="you@example.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="passwordInput">Password</label>
+        <input type="password" id="passwordInput" name="password" class="input-control" placeholder="At least 8 characters" required minlength="8">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" id="authSubmitBtn">
+        {% if mode == 'register' %}Create Free Account{% else %}Sign In to Dashboard{% endif %}
+      </button>
+    </form>
+
+    <!-- One Click Demo Login -->
+    <div class="demo-login-box">
+      <p style="font-size: 0.78rem; color: var(--ink-muted); margin-bottom: 0.75rem;">Want to test immediately without typing?</p>
+      <button type="button" class="btn btn-outline-sm" style="width: 100%;" onclick="quickDemoLogin()">
+        ⚡ One-Click Instant Demo Login
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.AUTH_MODE = "{{ mode }}";
+</script>
+{% endblock %}

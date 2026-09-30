@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}PocketSmart AI — Smart Budget & Cross-Platform Recommendation Assistant{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-wrapper">
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="status-dot"></span>
+      GenAI-Powered Cross-Platform Recommender
+    </div>
+    <h1 class="hero-title">
+      Plan smarter.<br>
+      Spend with <span class="gradient-text">absolute confidence.</span>
+    </h1>
+    <p class="hero-desc">
+      PocketSmart AI transforms budgeting across home interiors, party events, and occasion jewelry. Powered by Google Gemini, it balances style, functionality, and price across IKEA, Amazon, Flipkart, Swiggy, Zomato, and OYO.
+    </p>
+
+    <div class="hero-actions">
+      <a href="/planner/home" class="btn btn-primary">
+        <span>Start Home Plan</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="/planner/party" class="btn btn-outline">
+        <span>Party Planner</span>
+      </a>
+      <a href="/planner/jewelry" class="btn btn-outline">
+        <span>Jewelry Matcher</span>
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <span class="stat-value">3</span>
+        <span class="stat-label">Smart Planners</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">8+</span>
+        <span class="stat-label">Commerce Ecosystems</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">100%</span>
+        <span class="stat-label">Budget Precision</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-card-stack">
+      <img src="/static/img/home_interior.jpg" alt="PocketSmart AI Home Interior Budget Planning" class="hero-image">
+      <div class="hero-floating-badge">
+        <div>
+          <div class="floating-badge-title">AI Proportional Allocation</div>
+          <div class="floating-badge-sub">✓ Furniture · Lighting · Decor · Buffer</div>
+        </div>
+        <span class="plat-tag ikea">IKEA + Amazon</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Scenario Showcase Cards -->
+<div class="section-head">
+  <h2>Three Purpose-Built Planners</h2>
+  <p>Select a scenario to experience personalized AI budget optimization tailored to your specific life needs.</p>
+</div>
+
+<section class="scenario-grid">
+  <!-- Scenario 1: Home Interior -->
+  <article class="scenario-card">
+    <div class="scenario-thumb">
+      <img src="/static/img/home_interior.jpg" alt="Home Interior Planning">
+      <span class="scenario-tag">Scenario 1</span>
+    </div>
+    <div class="scenario-body">
+      <h3 class="scenario-title">🏠 Home Interior Planner</h3>
+      <p class="scenario-desc">
+        Enter your budget and select room types like Living Room, Bedroom, or Kitchen. Specify exact quantities for ceiling lights, BLDC fans, dining tables, and sofas.
+      </p>
+      <ul class="scenario-features">
+        <li>Multi-room selection & interactive quantity steppers</li>
+        <li>Proportional allocation across furniture & lighting</li>
+        <li>Curated picks from IKEA, Amazon & Flipkart</li>
+      </ul>
+      <a href="/planner/home" class="btn btn-outline">Launch Home Planner →</a>
+    </div>
+  </article>
+
+  <!-- Scenario 2: Party Planner -->
+  <article class="scenario-card">
+    <div class="scenario-thumb">
+      <img src="/static/img/party_event.jpg" alt="Party Budget Planning">
+      <span class="scenario-tag">Scenario 2</span>
+    </div>
+    <div class="scenario-body">
+      <h3 class="scenario-title">🎉 Party Budget Planner</h3>
+      <p class="scenario-desc">
+        Input total budget, guest count, and event type. Gemini computes per-guest cost and allocates spend across gourmet catering, themed decor, and entertainment.
+      </p>
+      <ul class="scenario-features">
+        <li>Real-time Cost-per-Guest efficiency metrics</li>
+        <li>Food & snacks sourced from Swiggy & Zomato</li>
+        <li>Venues & guest stays sourced via OYO Townhouses</li>
+      </ul>
+      <a href="/planner/party" class="btn btn-outline">Launch Party Planner →</a>
+    </div>
+  </article>
+
+  <!-- Scenario 3: Jewelry Planner -->
+  <article class="scenario-card">
+    <div class="scenario-thumb">
+      <img src="/static/img/jewelry_planner.jpg" alt="Jewelry Recommendations">
+      <span class="scenario-tag">Scenario 3</span>
+    </div>
+    <div class="scenario-body">
+      <h3 class="scenario-title">💎 Jewelry & Styling Matcher</h3>
+      <p class="scenario-desc">
+        Find matching jewelry for weddings, cocktail galas, or festive pujas. Upload an outfit image to let Gemini analyze colors, fabric, and aesthetics.
+      </p>
+      <ul class="scenario-features">
+        <li>Outfit photo upload with automatic color extraction</li>
+        <li>Styles: Kundan, Temple, Minimalist, American Diamond</li>
+        <li>Curated sets from Amazon, Flipkart, Tanishq & GIVA</li>
+      </ul>
+      <a href="/planner/jewelry" class="btn btn-outline">Launch Jewelry Planner →</a>
+    </div>
+  </article>
+</section>
+
+<!-- Integrated Ecosystems Banner -->
+<section class="ecosystem-banner">
+  <div class="ecosystem-info">
+    <h3>Cross-Platform Commerce Ecosystem</h3>
+    <p>PocketSmart AI bridges multiple e-commerce categories and vendor platforms into a single intelligent view.</p>
+  </div>
+  <div class="platform-grid">
+    <span class="plat-tag ikea">IKEA</span>
+    <span class="plat-tag amazon">Amazon</span>
+    <span class="plat-tag flipkart">Flipkart</span>
+    <span class="plat-tag swiggy">Swiggy</span>
+    <span class="plat-tag zomato">Zomato</span>
+    <span class="plat-tag oyo">OYO</span>
+    <span class="plat-tag tanishq">Tanishq</span>
+    <span class="plat-tag blinkit">Blinkit</span>
+  </div>
+</section>
+{% endblock %}

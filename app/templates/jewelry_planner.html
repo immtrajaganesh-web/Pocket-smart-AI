@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block title %}Jewelry & Styling Budget Planner — PocketSmart AI{% endblock %}
+
+{% block content %}
+<!-- Planner Header -->
+<div class="planner-header" style="background-image: url('/static/img/jewelry_planner.jpg');">
+  <div class="planner-header-content">
+    <div class="hero-eyebrow">
+      <span>💎 SCENARIO 3</span>
+      <span>•</span>
+      <span>OUTFIT & OCCASION JEWELRY</span>
+    </div>
+    <h1>Jewelry Recommendation Assistant</h1>
+    <p>
+      Enter your budget, pick your occasion, and optionally upload a photo of your outfit. Gemini performs multimodal color coordination and style analysis to recommend matching necklaces, earrings, and bangles from Amazon, Flipkart, Tanishq, and CaratLane.
+    </p>
+  </div>
+</div>
+
+<!-- Quick Presets -->
+<div class="preset-bar">
+  <span class="preset-label">Style Presets:</span>
+  <button type="button" class="preset-chip" onclick="applyJewelryPreset('boho')">🌙 Boho Silver Vibe (₹5,000)</button>
+  <button type="button" class="preset-chip" onclick="applyJewelryPreset('cocktail')">💎 Cocktail Solitaires (₹15,000)</button>
+  <button type="button" class="preset-chip" onclick="applyJewelryPreset('kundan')">👑 Royal Kundan Set (₹45,000)</button>
+  <button type="button" class="preset-chip" onclick="applyJewelryPreset('bridal')">👰 Bridal Heritage Look (₹1,50,000)</button>
+</div>
+
+<!-- Main Form -->
+<form id="jewelryForm" class="glass-card planner-form" enctype="multipart/form-data">
+  <!-- Section 1: Budget -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>💰</span> Jewelry Budget Allocation
+    </h3>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label for="jewelryBudget">Maximum Budget</label>
+        <div class="input-with-affix">
+          <span class="input-affix">₹</span>
+          <input type="number" id="jewelryBudget" name="budget" class="input-control has-affix" placeholder="e.g. 25000" min="500" value="25000" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="jewelryCurrency">Currency</label>
+        <select id="jewelryCurrency" name="currency" class="input-control">
+          <option value="INR" selected>INR (₹) — Indian Rupee</option>
+          <option value="USD">USD ($) — US Dollar</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Occasion -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>✨</span> Select Occasion / Event
+    </h3>
+    <div class="chips-grid" id="occasionChips">
+      <label class="chip-option selected">
+        <input type="radio" name="occasion" value="Wedding / Bridal" checked>
+        <span>👰 Wedding / Bridal</span>
+      </label>
+      <label class="chip-option">
+        <input type="radio" name="occasion" value="Sangeet & Reception">
+        <span>💃 Sangeet & Reception</span>
+      </label>
+      <label class="chip-option">
+        <input type="radio" name="occasion" value="Cocktail & Black Tie Gala">
+        <span>🍸 Cocktail Gala</span>
+      </label>
+      <label class="chip-option">
+        <input type="radio" name="occasion" value="Festive / Diwali / Puja">
+        <span>🪔 Festive & Puja</span>
+      </label>
+      <label class="chip-option">
+        <input type="radio" name="occasion" value="Everyday Minimalist">
+        <span>👗 Everyday Chic</span>
+      </label>
+      <label class="chip-option">
+        <input type="radio" name="occasion" value="Formal / Workwear">
+        <span>💼 Workwear Formal</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Section 3: Style & Metal Tone -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>👑</span> Style Aesthetic & Metal Tone
+    </h3>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>Jewelry Aesthetic Style</label>
+        <div class="chips-grid" id="jewelryStyleChips">
+          <label class="chip-option selected">
+            <input type="radio" name="style" value="Royal Kundan & Polki" checked>
+            <span>👑 Royal Kundan & Polki</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="South Indian Temple Jewelry">
+            <span>🛕 Temple Jewelry</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="Minimalist Contemporary">
+            <span>✨ Minimalist Modern</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="American Diamond Solitaires">
+            <span>💎 American Diamond / CZ</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="Bohemian Oxidized Silver">
+            <span>🌙 Boho Silver</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Metal / Material Preference</label>
+        <div class="chips-grid" id="metalChips">
+          <label class="chip-option selected">
+            <input type="radio" name="metal" value="Yellow Gold Tone" checked>
+            <span>🟡 Yellow Gold</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="metal" value="Rose Gold">
+            <span>🌸 Rose Gold</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="metal" value="Platinum / 925 Silver">
+            <span>⚪ Platinum / Silver</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="metal" value="Oxidized Antique">
+            <span>🪙 Oxidized Antique</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Outfit Visual Upload & Color Matcher -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>👗</span> Outfit Visual Coordination (Optional)
+    </h3>
+
+    <div class="dropzone-container" id="dropzoneBox">
+      <input type="file" id="outfitImageInput" name="outfit_image" accept="image/*" onchange="handleImageSelection(this)">
+      <div class="dropzone-icon">📸</div>
+      <div class="dropzone-title">Upload Outfit Photo for AI Visual Color Matching</div>
+      <div class="dropzone-sub">Drag & drop or click to browse (PNG, JPG, WEBP up to 8MB)</div>
+    </div>
+
+    <!-- Live Preview & Palette Box -->
+    <div class="image-preview-panel hidden" id="imagePreviewBox">
+      <img id="previewImg" src="" alt="Selected Outfit" class="preview-thumb">
+      <div class="preview-meta">
+        <div class="preview-name" id="previewFileName">outfit.jpg</div>
+        <div style="font-size: 0.78rem; color: var(--ink-muted); margin-top: 0.2rem;">
+          Detected Dominant Color Harmony:
+        </div>
+        <div class="palette-swatches" id="paletteSwatches"></div>
+      </div>
+      <button type="button" class="btn btn-outline-sm" onclick="clearOutfitImage()">Remove</button>
+    </div>
+
+    <div class="form-group" style="margin-top: 1rem;">
+      <label for="outfitDescInput">Outfit Description & Styling Details</label>
+      <textarea id="outfitDescInput" name="outfit_description" class="input-control" rows="2" placeholder="e.g. Royal emerald green silk lehenga with gold zardozi embroidery and sweetheart neckline"></textarea>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" id="jewelrySubmitBtn">
+    <span id="btnText">✨ Generate Matched Jewelry Plan</span>
+  </button>
+</form>
+
+<!-- Results Dynamic Container -->
+<div id="result"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/planner.js?v=2.0"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    initJewelryForm();
+  });
+</script>
+{% endblock %}

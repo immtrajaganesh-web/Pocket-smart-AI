@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Home Interior Budget Planner — PocketSmart AI{% endblock %}
+
+{% block content %}
+<!-- Planner Header -->
+<div class="planner-header" style="background-image: url('/static/img/home_interior.jpg');">
+  <div class="planner-header-content">
+    <div class="hero-eyebrow">
+      <span>🏠 SCENARIO 1</span>
+      <span>•</span>
+      <span>SMART BUDGET ALLOCATION</span>
+    </div>
+    <h1>Home Interior Planner</h1>
+    <p>
+      Specify your total budget, room types, and required item counts for lighting, ceiling fans, and dining sets. Gemini allocates your budget proportionally and recommends matched options across IKEA, Amazon, and Flipkart.
+    </p>
+  </div>
+</div>
+
+<!-- Quick Presets -->
+<div class="preset-bar">
+  <span class="preset-label">Quick Presets:</span>
+  <button type="button" class="preset-chip" onclick="applyHomePreset('1bhk')">📦 1BHK Starter (₹35,000)</button>
+  <button type="button" class="preset-chip" onclick="applyHomePreset('2bhk')">✨ 2BHK Modern (₹85,000)</button>
+  <button type="button" class="preset-chip" onclick="applyHomePreset('3bhk')">🏰 3BHK Full Decor (₹2,50,000)</button>
+  <button type="button" class="preset-chip" onclick="applyHomePreset('luxury')">💎 Luxury Vibe (₹6,00,000)</button>
+</div>
+
+<!-- Main Form -->
+<form id="homeForm" class="glass-card planner-form">
+  <!-- Section 1: Budget & Currency -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>💰</span> Define Your Interior Budget
+    </h3>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label for="budgetInput">Total Budget Limit</label>
+        <div class="input-with-affix">
+          <span class="input-affix">₹</span>
+          <input type="number" id="budgetInput" name="budget" class="input-control has-affix" placeholder="e.g. 50000" min="1000" value="50000" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="currencySelect">Currency</label>
+        <select id="currencySelect" name="currency" class="input-control">
+          <option value="INR" selected>INR (₹) — Indian Rupee</option>
+          <option value="USD">USD ($) — US Dollar</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Room Selection -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>🚪</span> Select Room Types to Decorate
+    </h3>
+    <div class="chips-grid" id="roomsChips">
+      <label class="chip-option selected">
+        <input type="checkbox" name="rooms" value="Living Room" checked>
+        <span>🛋️ Living Room</span>
+      </label>
+      <label class="chip-option selected">
+        <input type="checkbox" name="rooms" value="Master Bedroom" checked>
+        <span>🛏️ Master Bedroom</span>
+      </label>
+      <label class="chip-option">
+        <input type="checkbox" name="rooms" value="Kitchen">
+        <span>🍳 Kitchen</span>
+      </label>
+      <label class="chip-option selected">
+        <input type="checkbox" name="rooms" value="Dining Area" checked>
+        <span>🍽️ Dining Area</span>
+      </label>
+      <label class="chip-option">
+        <input type="checkbox" name="rooms" value="Balcony / Garden">
+        <span>🌿 Balcony / Garden</span>
+      </label>
+      <label class="chip-option">
+        <input type="checkbox" name="rooms" value="Home Office">
+        <span>💻 Home Office</span>
+      </label>
+      <label class="chip-option">
+        <input type="checkbox" name="rooms" value="Kids Room">
+        <span>🧸 Kids Room</span>
+      </label>
+      <label class="chip-option">
+        <input type="checkbox" name="rooms" value="Bathroom">
+        <span>🚿 Bathroom</span>
+      </label>
+    </div>
+  </div>
+
+  <!-- Section 3: Item Quantities -->
+  <div class="form-section">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <h3 class="form-section-title">
+        <span>📐</span> Specify Quantities for Key Items
+      </h3>
+      <span style="font-size: 0.8rem; color: var(--ink-muted);">Use +/- to adjust item counts</span>
+    </div>
+    
+    <div class="item-stepper-grid">
+      <!-- Lights -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">💡</span>
+          <div>
+            <div class="stepper-name">Ceiling Lights / Downlights</div>
+            <div class="stepper-sub">LED & Spot fixtures</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('lights', -1)">-</button>
+          <span class="stepper-value" id="val-lights">4</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('lights', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Fans -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🌀</span>
+          <div>
+            <div class="stepper-name">Ceiling Fans</div>
+            <div class="stepper-sub">BLDC Energy Savers</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('ceiling_fans', -1)">-</button>
+          <span class="stepper-value" id="val-ceiling_fans">2</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('ceiling_fans', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Dining Table -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🍽️</span>
+          <div>
+            <div class="stepper-name">Dining Table & Chairs</div>
+            <div class="stepper-sub">4 / 6 Seater Set</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('dining_tables', -1)">-</button>
+          <span class="stepper-value" id="val-dining_tables">1</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('dining_tables', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Sofa -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🛋️</span>
+          <div>
+            <div class="stepper-name">Sofa Set / Couches</div>
+            <div class="stepper-sub">Fabric / Sectional</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('sofas', -1)">-</button>
+          <span class="stepper-value" id="val-sofas">1</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('sofas', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Bedside & Storage -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🗄️</span>
+          <div>
+            <div class="stepper-name">Bedside / Storage Units</div>
+            <div class="stepper-sub">Shelving & Drawers</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('storage_units', -1)">-</button>
+          <span class="stepper-value" id="val-storage_units">2</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('storage_units', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Wall Art & Decor -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🖼️</span>
+          <div>
+            <div class="stepper-name">Wall Art & Decor</div>
+            <div class="stepper-sub">Canvas, Mirrors, Vases</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('wall_decor', -1)">-</button>
+          <span class="stepper-value" id="val-wall_decor">2</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('wall_decor', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Curtains -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🪟</span>
+          <div>
+            <div class="stepper-name">Curtains & Drapes</div>
+            <div class="stepper-sub">Blackout / Sheer sets</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('curtains', -1)">-</button>
+          <span class="stepper-value" id="val-curtains">2</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('curtains', 1)">+</button>
+        </div>
+      </div>
+
+      <!-- Rugs -->
+      <div class="stepper-card">
+        <div class="stepper-info">
+          <span class="stepper-icon">🧶</span>
+          <div>
+            <div class="stepper-name">Area Rugs</div>
+            <div class="stepper-sub">Woven / Anti-slip</div>
+          </div>
+        </div>
+        <div class="stepper-controls">
+          <button type="button" class="stepper-btn" onclick="stepItem('rugs', -1)">-</button>
+          <span class="stepper-value" id="val-rugs">1</span>
+          <button type="button" class="stepper-btn" onclick="stepItem('rugs', 1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Style & Priorities -->
+  <div class="form-section">
+    <h3 class="form-section-title">
+      <span>🎨</span> Aesthetic Style & Key Priorities
+    </h3>
+    <div class="form-grid-2">
+      <div class="form-group">
+        <label>Design Theme</label>
+        <div class="chips-grid" id="styleChips">
+          <label class="chip-option selected">
+            <input type="radio" name="style" value="Scandinavian Modern" checked>
+            <span>🌿 Scandinavian Modern</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="Minimalist Contemporary">
+            <span>✨ Minimalist Contemporary</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="Contemporary Indian">
+            <span>🪔 Contemporary Indian</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="Industrial Loft">
+            <span>🧱 Industrial Loft</span>
+          </label>
+          <label class="chip-option">
+            <input type="radio" name="style" value="Boho Chic">
+            <span>🪴 Boho Chic</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Key Priorities</label>
+        <div class="chips-grid" id="priorityChips">
+          <label class="chip-option selected">
+            <input type="checkbox" name="priorities" value="Energy Efficient BLDC" checked>
+            <span>⚡ Energy Efficient (BLDC)</span>
+          </label>
+          <label class="chip-option selected">
+            <input type="checkbox" name="priorities" value="High Durability" checked>
+            <span>🛡️ High Durability</span>
+          </label>
+          <label class="chip-option">
+            <input type="checkbox" name="priorities" value="Smart Home IoT">
+            <span>📱 Smart Home IoT</span>
+          </label>
+          <label class="chip-option">
+            <input type="checkbox" name="priorities" value="Fast Delivery">
+            <span>🚀 Fast Delivery</span>
+          </label>
+          <label class="chip-option">
+            <input type="checkbox" name="priorities" value="Budget Value Pick">
+            <span>🏷️ Value for Money</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary" id="homeSubmitBtn">
+    <span id="btnText">✨ Generate Home Budget Plan</span>
+  </button>
+</form>
+
+<!-- Results Dynamic Container -->
+<div id="result"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/planner.js?v=2.0"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    initHomeForm();
+  });
+</script>
+{% endblock %}

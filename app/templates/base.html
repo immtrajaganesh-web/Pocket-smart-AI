@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}PocketSmart AI — Smart Budget & Cross-Platform Recommendation Assistant{% endblock %}</title>
+  <meta name="description" content="GenAI-powered cross-platform budget planner for home interior, party events, and occasion jewelry with Gemini and top marketplaces like IKEA, Amazon, Swiggy, Zomato, and OYO.">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/static/css/app.css?v=2.0">
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <!-- Global Top Bar & Navigation -->
+  <header class="navbar" id="siteNavbar">
+    <div class="nav-container">
+      <a class="nav-brand" href="/">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">PocketSmart</span>
+          <span class="brand-badge">AI</span>
+        </div>
+      </a>
+
+      <!-- AI Status Chip -->
+      <div class="ai-status-pill" id="aiStatusPill" title="Gemini GenAI recommendation engine status">
+        <span class="status-dot"></span>
+        <span class="status-label" id="statusLabel">Gemini Active</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="nav-menu" id="navMenu">
+        <a href="/" class="nav-link {% if request.url.path == '/' %}active{% endif %}">
+          <span>Overview</span>
+        </a>
+        <a href="/planner/home" class="nav-link {% if 'planner/home' in request.url.path %}active{% endif %}">
+          <span class="icon">🏠</span> Home Interior
+        </a>
+        <a href="/planner/party" class="nav-link {% if 'planner/party' in request.url.path %}active{% endif %}">
+          <span class="icon">🎉</span> Party Planner
+        </a>
+        <a href="/planner/jewelry" class="nav-link {% if 'planner/jewelry' in request.url.path %}active{% endif %}">
+          <span class="icon">💎</span> Jewelry & Styling
+        </a>
+        <a href="/dashboard" class="nav-link {% if request.url.path == '/dashboard' %}active{% endif %}" id="dashNavLink">
+          <span class="icon">📊</span> Dashboard
+        </a>
+      </nav>
+
+      <!-- User Auth Section -->
+      <div class="nav-auth" id="navAuth">
+        <a href="/login" class="btn btn-outline-sm" id="loginBtn">Sign In</a>
+        <a href="/register" class="btn btn-primary-sm" id="registerBtn">Get Started</a>
+        <div class="user-profile-badge hidden" id="userBadge">
+          <span class="user-avatar" id="userInitial">U</span>
+          <span class="user-name" id="userNameLabel">Account</span>
+          <button class="btn-logout" id="logoutBtn" title="Sign out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Hamburger Toggle -->
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="app-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Global Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Global Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="brand-text">
+          <span class="brand-name">PocketSmart</span>
+          <span class="brand-badge">AI</span>
+        </div>
+        <p class="footer-tagline">GenAI-Powered Cross-Platform Smart Budget & Recommendation Assistant</p>
+      </div>
+
+      <div class="footer-platforms">
+        <span class="platform-label">Integrated Ecosystems:</span>
+        <div class="platform-badges">
+          <span class="plat-tag ikea">IKEA</span>
+          <span class="plat-tag amazon">Amazon</span>
+          <span class="plat-tag flipkart">Flipkart</span>
+          <span class="plat-tag swiggy">Swiggy</span>
+          <span class="plat-tag zomato">Zomato</span>
+          <span class="plat-tag oyo">OYO</span>
+          <span class="plat-tag tanishq">Tanishq</span>
+        </div>
+      </div>
+
+      <div class="footer-copy">
+        <p>© 2026 PocketSmart AI. Built with FastAPI & Google Gemini 3.5. Candidate marketplace data is a curated adapter for demo planning.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js?v=2.0"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}My Planning Dashboard — PocketSmart AI{% endblock %}
+
+{% block content %}
+<div class="page-head" style="margin-bottom: 2rem;">
+  <div>
+    <div class="hero-eyebrow">SAVED PLANS & STRATEGY</div>
+    <h1 style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: #fff;">My Budget Plans</h1>
+    <p style="color: var(--ink-secondary); font-size: 1rem;">View, analyze, and manage your AI-generated budget allocations and marketplace recommendations.</p>
+  </div>
+  <div style="display: flex; gap: 0.75rem;">
+    <a href="/planner/home" class="btn btn-outline-sm">🏠 New Home Plan</a>
+    <a href="/planner/party" class="btn btn-outline-sm">🎉 New Party Plan</a>
+    <a href="/planner/jewelry" class="btn btn-outline-sm">💎 New Jewelry Plan</a>
+  </div>
+</div>
+
+<!-- Dashboard Metric Cards -->
+<div class="dashboard-metrics-grid">
+  <div class="dash-metric-card">
+    <div class="dash-metric-icon indigo">📊</div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--ink-muted); text-transform: uppercase;">Total Plans Saved</div>
+      <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #fff;" id="metricPlanCount">0</div>
+    </div>
+  </div>
+
+  <div class="dash-metric-card">
+    <div class="dash-metric-icon emerald">💰</div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--ink-muted); text-transform: uppercase;">Total Capital Planned</div>
+      <div style="font-family: var(--font-display); font-size: 1.8rem; font-weight: 800; color: #34d399;" id="metricTotalBudget">₹0</div>
+    </div>
+  </div>
+
+  <div class="dash-metric-card">
+    <div class="dash-metric-icon amber">⚡</div>
+    <div>
+      <div style="font-size: 0.8rem; color: var(--ink-muted); text-transform: uppercase;">AI Engine Mode</div>
+      <div style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: #fbbf24;" id="metricAiMode">Gemini 3.5</div>
+    </div>
+  </div>
+</div>
+
+<!-- History Plans Section -->
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+  <h3 style="font-family: var(--font-display); font-size: 1.25rem; font-weight: 700; color: #fff;">Saved Recommendations</h3>
+  <div class="rec-filter-chips" id="dashboardFilters">
+    <button type="button" class="rec-filter-btn active" onclick="filterDashboard('all')">All Plans</button>
+    <button type="button" class="rec-filter-btn" onclick="filterDashboard('home')">🏠 Home</button>
+    <button type="button" class="rec-filter-btn" onclick="filterDashboard('party')">🎉 Party</button>
+    <button type="button" class="rec-filter-btn" onclick="filterDashboard('jewelry')">💎 Jewelry</button>
+  </div>
+</div>
+
+<div id="dashboardList" class="stack">
+  <div class="glass-card" style="text-align: center; padding: 3rem;">
+    <div class="spinner"></div>
+    <p style="margin-top: 1rem; color: var(--ink-muted);">Loading your planning history...</p>
+  </div>
+</div>
+
+<!-- Plan Details Modal -->
+<div class="modal-overlay" id="planModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <span class="platform-pill" id="modalPlannerBadge">Home</span>
+        <h2 id="modalPlanTitle" style="font-family: var(--font-display); font-size: 1.4rem; margin-top: 0.35rem; color: #fff;">Plan Title</h2>
+      </div>
+      <button class="modal-close-btn" onclick="closePlanModal()">&times;</button>
+    </div>
+    <div id="modalPlanBody"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/planner.js?v=2.0"></script>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    loadDashboardHistory();
+  });
+</script>
+{% endblock %}
