@@ -11,6 +11,20 @@ async def lifespan(app): Base.metadata.create_all(bind=engine);yield
 Base.metadata.create_all(bind=engine)
 app=FastAPI(title=s.app_name,version="1.0.0",lifespan=lifespan)
 app.add_middleware(CORSMiddleware,allow_origins=s.origins,allow_credentials=True,allow_methods=["*"],allow_headers=["*"])
+
+from starlette.requests import Request
+@app.middleware("http")
+async def vercel_url_normalizer(request: Request, call_next):
+    path = request.scope.get("path", "")
+    for prefix in ("/api/index.py", "/index.py", "/main.py"):
+        if path == prefix:
+            request.scope["path"] = "/"
+            break
+        elif path.startswith(prefix + "/"):
+            request.scope["path"] = path[len(prefix):]
+            break
+    return await call_next(request)
+
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent
 app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
